@@ -49,18 +49,21 @@ def dispatch(args, df_trace):
                 plot_purchase_comparison(df_costs)
 
         elif args.cmd == 'decision':
-            df_pred = aggregate_predictions(pd.read_csv(args.predictions),
-                                            args.aggregate)
+            df_pred = aggregate_predictions(
+                pd.read_csv(args.predictions), args.aggregate
+            )
 
             if args.option == 'score':
                 score = compute_agreement_score(df_pred, df_da, df_im)
                 logging.info(
-                    f"The AA score of the predictions is {score: 0.3f}%.")
+                    f"The AA score of the predictions is {score: 0.3f}%."
+                )
             elif args.option == 'schedule':
                 logging.info('DVFS scheduler invoked.')
                 df_power = process_traces_for_scheduling(df_trace)
-                df_sched = schedule(args.factor, df_pred, df_da, df_power,
-                                    args.save_to)
+                df_sched = schedule(
+                    args.factor, df_pred, df_da, df_power, args.save_to
+                )
                 pprint(df_sched)
 
                 if args.save_to:
@@ -75,38 +78,48 @@ def main():
     # Setup logging
     logging.basicConfig(
         level=logging.INFO,
-        format='(%(asctime)s) OpenDC EEMM - [%(levelname)s] %(message)s')
+        format='(%(asctime)s) OpenDC EEMM - [%(levelname)s] %(message)s'
+    )
 
     parser = argparse.ArgumentParser(
         add_help=False,
         description="CLI of OpenDC Extension for Energy Modelling & Managament."
     )
-    subparsers = parser.add_subparsers(dest='cmd',
-                                       description='Available commands.')
-    parser.add_argument('-v',
-                        '--version',
-                        action='version',
-                        version='%(prog)s ' + __version__,
-                        help="Show version number of the package and exit.")
-    parser.add_argument('-h',
-                        '--help',
-                        action='help',
-                        default=argparse.SUPPRESS,
-                        help='Show the help messages and exit.')
+    subparsers = parser.add_subparsers(
+        dest='cmd', description='Available commands.'
+    )
+    parser.add_argument(
+        '-v',
+        '--version',
+        action='version',
+        version='%(prog)s ' + __version__,
+        help="Show version number of the package and exit."
+    )
+    parser.add_argument(
+        '-h',
+        '--help',
+        action='help',
+        default=argparse.SUPPRESS,
+        help='Show the help messages and exit.'
+    )
     parser.add_argument(
         '-t',
         '--trace',
         required=True,
         metavar='path',
-        help='Path to simulation results (expecting a Parque file).')
-    parser.add_argument('--pue',
-                        default=1.58,
-                        type=float,
-                        metavar='float',
-                        help='PUE value of the simulatied datacenter.')
+        help='Path to simulation results (expecting a Parque file).'
+    )
+    parser.add_argument(
+        '--pue',
+        default=1.58,
+        type=float,
+        metavar='float',
+        help='PUE value of the simulatied datacenter.'
+    )
 
-    trace_parser = subparsers.add_parser('trace',
-                                         help='Visualize simulation results.')
+    trace_parser = subparsers.add_parser(
+        'trace', help='Visualize simulation results.'
+    )
     trace_parser.add_argument(
         '-s',
         '--show',
@@ -116,45 +129,54 @@ def main():
         help=
         "Choose 'power' to show power draw; choose 'oc' to show over-commissioned."
     )
-    trace_parser.add_argument('-f',
-                              '--frequency',
-                              type=float,
-                              default=2670,
-                              metavar='float',
-                              help='Frequency of simulated machines.')
-    trace_parser.add_argument('-g',
-                              '--governor',
-                              metavar='value',
-                              help='Governor to visualize.')
+    trace_parser.add_argument(
+        '-f',
+        '--frequency',
+        type=float,
+        default=2670,
+        metavar='float',
+        help='Frequency of simulated machines.'
+    )
+    trace_parser.add_argument(
+        '-g', '--governor', metavar='value', help='Governor to visualize.'
+    )
 
     market_parser = subparsers.add_parser(
-        'market', help='Compare costs in different markets.')
-    market_parser.add_argument('-s',
-                               '--show',
-                               required=True,
-                               choices=['load', 'strategy'],
-                               metavar="['load', 'strategy']")
-    market_parser.add_argument('-o',
-                               '--od_price',
-                               required=True,
-                               type=float,
-                               metavar='float',
-                               help='On-demand energy price.')
+        'market', help='Compare costs in different markets.'
+    )
+    market_parser.add_argument(
+        '-s',
+        '--show',
+        required=True,
+        choices=['load', 'strategy'],
+        metavar="['load', 'strategy']"
+    )
+    market_parser.add_argument(
+        '-o',
+        '--od_price',
+        required=True,
+        type=float,
+        metavar='float',
+        help='On-demand energy price.'
+    )
     market_parser.add_argument(
         '-d',
         '--dayahead_prices',
         required=True,
         metavar='path',
-        help='Path to day-ahead energy prices (expecting a CSV file).')
+        help='Path to day-ahead energy prices (expecting a CSV file).'
+    )
     market_parser.add_argument(
         '-i',
         '--imbalance_prices',
         required=True,
         metavar='path',
-        help='Path to imbalance energy prices (expecting a CSV file).')
+        help='Path to imbalance energy prices (expecting a CSV file).'
+    )
 
     schedule_parser = subparsers.add_parser(
-        'decision', help='Optimize fine-grained decision-making.')
+        'decision', help='Optimize fine-grained decision-making.'
+    )
     schedule_parser.add_argument(
         '-o',
         '--option',
@@ -164,41 +186,49 @@ def main():
         help=
         "Choose 'score' to compute the agreement accuracy (AA) sore of the predictions; choose 'schedule' for DVFS scheduling."
     )
-    schedule_parser.add_argument('-f',
-                                 '--factor',
-                                 type=float,
-                                 metavar='float',
-                                 help='Damping factor of the DVFS scheduler.')
+    schedule_parser.add_argument(
+        '-f',
+        '--factor',
+        type=float,
+        metavar='float',
+        help='Damping factor of the DVFS scheduler.'
+    )
     schedule_parser.add_argument(
         '-d',
         '--dayahead_prices',
         required=True,
         metavar='path',
-        help='Path to day-ahead energy prices (expecting a CSV file).')
+        help='Path to day-ahead energy prices (expecting a CSV file).'
+    )
     schedule_parser.add_argument(
         '-i',
         '--imbalance_prices',
         required=True,
         metavar='path',
-        help='Path to imbalance energy prices (expecting a CSV file).')
+        help='Path to imbalance energy prices (expecting a CSV file).'
+    )
     schedule_parser.add_argument(
         '-p',
         '--predictions',
         required=True,
         metavar='path',
-        help='Machine learning predictions (expecting a CSV file).')
+        help='Machine learning predictions (expecting a CSV file).'
+    )
     schedule_parser.add_argument(
         '-a',
         '--aggregate',
         required=True,
         choices=['first', 'last', 'mean'],
         metavar="['first', 'last', 'mean']",
-        help="Aggregation method for machine learning predictions.")
-    schedule_parser.add_argument('-s',
-                                 '--save_to',
-                                 default=None,
-                                 metavar='path',
-                                 help='Destination path of the DVFS schedule.')
+        help="Aggregation method for machine learning predictions."
+    )
+    schedule_parser.add_argument(
+        '-s',
+        '--save_to',
+        default=None,
+        metavar='path',
+        help='Destination path of the DVFS schedule.'
+    )
 
     args = parser.parse_args()
 

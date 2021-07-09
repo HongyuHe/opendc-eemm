@@ -10,14 +10,26 @@ from .market import extend_spot_prices
 def compute_agreement_score(df_pred, df_da, df_im):
     epsilon = 10
     df_da = extend_spot_prices(df_da, df_pred)
-    perf = ((
-        (np.sign(df_im['shortage-price']) == np.sign(
-            df_pred['shortage-predicted']))
-        & (np.sign(
-            round(df_im['shortage-price'] - df_da['dayahead-price'], epsilon))
-           == np.sign(
-               round(df_pred['shortage-predicted'] - df_da['dayahead-price'],
-                     epsilon)))).value_counts().to_dict())
+    perf = (
+        (
+            (
+                np.sign(df_im['shortage-price'])
+                == np.sign(df_pred['shortage-predicted'])
+            ) & (
+                np.sign(
+                    round(
+                        df_im['shortage-price'] - df_da['dayahead-price'],
+                        epsilon
+                    )
+                ) == np.sign(
+                    round(
+                        df_pred['shortage-predicted'] - df_da['dayahead-price'],
+                        epsilon
+                    )
+                )
+            )
+        ).value_counts().to_dict()
+    )
     perf[False] = perf[False] if False in perf else 0
 
     return perf[True] / (perf[False] + perf[True]) * 100
@@ -25,12 +37,14 @@ def compute_agreement_score(df_pred, df_da, df_im):
 
 def process_traces_for_scheduling(df_trace):
     df = (
-        df_trace[df_trace['power-model'] != 'BASE'].drop([
-            'duration', 'state', 'vm-count', 'requested-burst',
-            'granted-burst', 'interfered-burst', 'cpu-usage', 'cpu-demand',
-            'cores'
-        ],
-                                                         axis=1)
+        df_trace[df_trace['power-model'] != 'BASE'].drop(
+            [
+                'duration', 'state', 'vm-count', 'requested-burst',
+                'granted-burst', 'interfered-burst', 'cpu-usage', 'cpu-demand',
+                'cores'
+            ],
+            axis=1
+        )
         # Average two power models
         .groupby(['governor', 'host-id', 'timestamp']).mean()
         # Aggregate hosts' data
@@ -38,7 +52,8 @@ def process_traces_for_scheduling(df_trace):
         # Aggregate to ISP (15min)
         .groupby(['governor',
                   pd.Grouper(freq='15min',
-                             key='timestamp')]).sum().drop('no-dvfs'))
+                             key='timestamp')]).sum().drop('no-dvfs')
+    )
     df['consumption'] = watt_to_mwh(df['power-draw'])
     return df
 
@@ -85,10 +100,12 @@ def schedule(damping, df_pred, df_da, df_trace, save_path=None):
 
         record = df_trace.loc[governor].reset_index().iloc[i % len(df_trace)]
         total_oc += record['overcommissioned-burst']
-        sched.append({
-            'timestamp': inference['interval-start'],
-            'governor': governor
-        })
+        sched.append(
+            {
+                'timestamp': inference['interval-start'],
+                'governor': governor
+            }
+        )
 
     df_sched = pd.DataFrame(sched)
     if save_path and not os.path.exists(save_path):
@@ -108,12 +125,12 @@ def compute_energy_cost(df_sched, df_price):
 
         if im_consumption > 0:
             # Shortage #
-            im_cost += (im_consumption * ledger['shortage-price']
-                        )  # BRP -> TSO
+            im_cost += (im_consumption * ledger['shortage-price'])  # BRP -> TSO
         elif im_consumption < 0:
             # Surplus #
-            im_cost += (im_consumption * ledger['spot-price']
-                        )  # TSO -> BRP (two-price system)
+            im_cost += (
+                im_consumption * ledger['spot-price']
+            )  # TSO -> BRP (two-price system)
         else:
             # Spot on #
             pass
@@ -125,8 +142,9 @@ def compute_energy_cost(df_sched, df_price):
 def get_governor_performance(governor, df_dc, df_price):
     # Extend simulation results.
     repeat = int(np.ceil(len(df_price) / len(df_dc.loc[governor])))
-    df_governor = pd.concat([df_dc.loc[governor].reset_index()] * repeat,
-                            ignore_index=True).iloc[:len(df_price)]
+    df_governor = pd.concat(
+        [df_dc.loc[governor].reset_index()] * repeat, ignore_index=True
+    ).iloc[:len(df_price)]
 
     return df_governor, {
         'governor': governor,
@@ -143,10 +161,12 @@ def get_schedule_performance(df_sched, df_price, governor_perf):
 
     return {
         'against':
-        governor_perf['governor'],
+            governor_perf['governor'],
         'cost %': (cost - governor_perf['cost']) / governor_perf['cost'] * 100,
-        'energy %': (consumption - governor_perf['consumption']) /
-        governor_perf['consumption'] * 100,
-        'overcommission %': (oc - governor_perf['overcommission']) /
-        governor_perf['overcommission'] * 100,
+        'energy %':
+            (consumption - governor_perf['consumption']) /
+            governor_perf['consumption'] * 100,
+        'overcommission %':
+            (oc - governor_perf['overcommission']) /
+            governor_perf['overcommission'] * 100,
     }

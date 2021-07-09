@@ -27,7 +27,8 @@ from .preprocess import *
 
 def set_hatches(ax, cycle):
     hatches = itertools.cycle(
-        ['/', '\\', 'x', '-', '.', '//', '+', '*', 'o', 'O'])
+        ['/', '\\', 'x', '-', '.', '//', '+', '*', 'o', 'O']
+    )
     for i, bar in enumerate(ax.patches):
         if i % cycle == 0:
             hatch = next(hatches)
@@ -78,15 +79,16 @@ def plot_power_draw(df, governor, core_freq):
 
     df = prepare_traces_for_plot(df, core_freq)
     hue_order = ['SQRT', 'LINEAR']
-    ax = sns.lineplot(data=df[(df.governor == governor)
-                              & (df['power-model'] != 'BASE')],
-                      hue_order=hue_order,
-                      x="timestamp",
-                      y='power-draw',
-                      hue='power-model',
-                      style='power-model',
-                      ci=90,
-                      n_boot=1500)
+    ax = sns.lineplot(
+        data=df[(df.governor == governor) & (df['power-model'] != 'BASE')],
+        hue_order=hue_order,
+        x="timestamp",
+        y='power-draw',
+        hue='power-model',
+        style='power-model',
+        ci=90,
+        n_boot=1500
+    )
 
     date_form = DateFormatter("%d %b")
     ax.xaxis.set_major_formatter(date_form)
@@ -100,13 +102,15 @@ def plot_power_draw(df, governor, core_freq):
 def plot_overcommission(df, core_freq):
     df = prepare_traces_for_plot(df, core_freq)
 
-    ax = sns.lineplot(data=df,
-                      x="timestamp",
-                      y='overcommissioned-burst',
-                      hue='governor',
-                      style='governor',
-                      ci=90,
-                      n_boot=1500)
+    ax = sns.lineplot(
+        data=df,
+        x="timestamp",
+        y='overcommissioned-burst',
+        hue='governor',
+        style='governor',
+        ci=90,
+        n_boot=1500
+    )
 
     date_form = DateFormatter("%d\ %b")
     ax.xaxis.set_major_formatter(date_form)
@@ -118,16 +122,18 @@ def plot_overcommission(df, core_freq):
 
 
 def plot_market_costs(df):
-    ax = sns.barplot(data=df,
-                     y='load',
-                     x='price',
-                     hue='market',
-                     palette='pastel',
-                     estimator=np.mean,
-                     ec='k',
-                     errwidth=2,
-                     capsize=0.1,
-                     errcolor='k')
+    ax = sns.barplot(
+        data=df,
+        y='load',
+        x='price',
+        hue='market',
+        palette='pastel',
+        estimator=np.mean,
+        ec='k',
+        errwidth=2,
+        capsize=0.1,
+        errcolor='k'
+    )
     ax.set(ylabel='Load Type', xlabel='Energy Cost [€]')
     ax.legend(title='Market')
     sns.despine(left=True)
@@ -137,16 +143,16 @@ def plot_market_costs(df):
 
 
 def plot_purchase_comparison(df_costs):
-    da_base = df_costs[(df_costs.load == 'baseload')
-                       & (df_costs.market == 'day-ahead')]['price'].mean()
-    im_peak = df_costs[(df_costs.load == 'peakload')
-                       & (df_costs.market == 'imbalance')]['price'].mean()
+    da_base = df_costs[(df_costs.load == 'baseload') &
+                       (df_costs.market == 'day-ahead')]['price'].mean()
+    im_peak = df_costs[(df_costs.load == 'peakload') &
+                       (df_costs.market == 'imbalance')]['price'].mean()
     da_im = da_base + im_peak
 
-    da_full = df_costs[(df_costs.load == 'fullload')
-                       & (df_costs.market == 'day-ahead')]['price'].mean()
-    od_full = df_costs[(df_costs.load == 'fullload')
-                       & (df_costs.market == 'on-demand')]['price'].mean()
+    da_full = df_costs[(df_costs.load == 'fullload') &
+                       (df_costs.market == 'day-ahead')]['price'].mean()
+    od_full = df_costs[(df_costs.load == 'fullload') &
+                       (df_costs.market == 'on-demand')]['price'].mean()
 
     odda_reduction = (od_full - da_full) / od_full * 100
     oddaim_reduction = (od_full - da_im) / od_full * 100
@@ -160,36 +166,32 @@ def plot_purchase_comparison(df_costs):
     y = [od_full, da_full, da_im]
 
     order = x
-    ax = sns.barplot(x=x,
-                     y=y,
-                     order=order,
-                     palette='deep',
-                     ec='k',
-                     lw=2,
-                     fill=True)
+    ax = sns.barplot(
+        x=x, y=y, order=order, palette='deep', ec='k', lw=2, fill=True
+    )
     ax.set_ylabel('Energy Cost [€]')
 
     set_hatches(ax, 1)
 
     show_values_on_bars(ax, 'v', 100, ' €')
 
-    add_stat_annotation(ax,
-                        x=x,
-                        y=y,
-                        order=order,
-                        box_pairs=[(da_cat, da_im_cat), (od_cat, da_cat),
-                                   (od_cat, da_im_cat)],
-                        text_annot_custom=[
-                            f"{abs(daim_reduction): 0.1f}\%",
-                            f"{odda_reduction: 0.1f}\%",
-                            f"{oddaim_reduction: 0.1f}\%"
-                        ],
-                        pvalues=[0, 0, 0],
-                        perform_stat_test=False,
-                        line_offset_to_box=0.08,
-                        text_offset=0.08,
-                        text_format='full',
-                        loc='inside',
-                        verbose=0)
+    add_stat_annotation(
+        ax,
+        x=x,
+        y=y,
+        order=order,
+        box_pairs=[(da_cat, da_im_cat), (od_cat, da_cat), (od_cat, da_im_cat)],
+        text_annot_custom=[
+            f"{abs(daim_reduction): 0.1f}\%", f"{odda_reduction: 0.1f}\%",
+            f"{oddaim_reduction: 0.1f}\%"
+        ],
+        pvalues=[0, 0, 0],
+        perform_stat_test=False,
+        line_offset_to_box=0.08,
+        text_offset=0.08,
+        text_format='full',
+        loc='inside',
+        verbose=0
+    )
     sns.despine(left=True)
     plt.show()

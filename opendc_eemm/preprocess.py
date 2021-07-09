@@ -11,10 +11,11 @@ watt_to_mwh = lambda x: np.float128(x * 5 * 60 * 2.7777777777778e-10)
 def preprocess_dayahead(df):
     df['interval-start'] = pd.to_datetime(
         df['MTU (CET)'].apply(lambda cell: cell.split('-')[0].strip()),
-        format='%d.%m.%Y %H:%M')
-    df = df.drop(
-        ['MTU (CET)', 'BZN|NL'],
-        axis=1).set_index('interval-start').reset_index()  # Reorder columns.
+        format='%d.%m.%Y %H:%M'
+    )
+    df = df.drop([
+        'MTU (CET)', 'BZN|NL'
+    ], axis=1).set_index('interval-start').reset_index()  # Reorder columns.
     df.columns = ['interval-start', 'dayahead-price']
     return df
 
@@ -27,8 +28,8 @@ def aggregate_predictions(df, agg, freq='15min'):
     if agg not in ['first', 'last', 'mean']:
         raise ValueError(f"{agg=} is not one of ['first', 'last', 'mean'].")
 
-    return df.groupby([pd.Grouper(freq=freq, key='interval-start')
-                       ]).agg(agg).reset_index()
+    return df.groupby([pd.Grouper(freq=freq,
+                                  key='interval-start')]).agg(agg).reset_index()
 
 
 def preprocess_imbalance(df_im):
@@ -59,23 +60,23 @@ def prepare_traces_for_plot(df, core_freq):
     usage_to_percent = lambda x: x['cpu-usage'] / (core_freq * x.cores) * 100
     demand_to_percent = lambda x: x['cpu-demand'] / (core_freq * x.cores) * 100
 
-    df = df.groupby([
-        'governor', 'power-model', 'host-id',
-        pd.Grouper(freq='1d', key='timestamp')
-    ]).mean().reset_index(level=['timestamp', 'host-id'])
+    df = df.groupby(
+        [
+            'governor', 'power-model', 'host-id',
+            pd.Grouper(freq='1d', key='timestamp')
+        ]
+    ).mean().reset_index(level=['timestamp', 'host-id'])
     df['cpu-usage'] = df.apply(usage_to_percent, axis=1)
     df['cpu-demand'] = df.apply(demand_to_percent, axis=1)
     return df.reset_index()
 
 
-def aggregate_consumption(df_raw,
-                          freq,
-                          kind='',
-                          power_model=None,
-                          preprocess=False):
+def aggregate_consumption(
+    df_raw, freq, kind='', power_model=None, preprocess=False
+):
     df = pd.DataFrame()
-    df_raw = df_raw[df_raw['power-model'] ==
-                    power_model] if power_model else df_raw
+    df_raw = df_raw[df_raw['power-model'] == power_model
+                   ] if power_model else df_raw
     df['timestamp'] = pd.to_datetime(df_raw['timestamp'], unit='ms')
 
     if (preprocess):
@@ -88,7 +89,7 @@ def aggregate_consumption(df_raw,
     else:
         df['consumption'] = df_raw.consumption
 
-    df = df.groupby([pd.Grouper(freq=freq, key='timestamp')
-                     ]).sum().reset_index(level=['timestamp'])
+    df = df.groupby([pd.Grouper(freq=freq, key='timestamp')]
+                   ).sum().reset_index(level=['timestamp'])
     df['kind'] = f"{kind} {freq}"
     return df
