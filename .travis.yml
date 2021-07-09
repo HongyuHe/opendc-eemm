@@ -1,0 +1,26 @@
+# Config file for automatic testing at travis-ci.com
+
+language: python
+python:
+  - 3.8
+  - 3.7
+  - 3.9
+
+# Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+install: pip install -U tox-travis
+
+script: tox
+# python setup.py test
+
+# Finish PyPI deployment setup:
+# $ travis encrypt --add deploy.password
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: hongyuhe
+  password:
+    secure: XXXX
+  on:
+    tags: true
+    repo: hongyuhe/opendc-eemm
+    python: 3.8

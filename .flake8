@@ -1,0 +1,3 @@
+[flacke8]
+extend-exclude=opendc_eemm/
+extend-ignore=W291
