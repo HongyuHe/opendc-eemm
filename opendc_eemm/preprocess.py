@@ -22,11 +22,11 @@ def preprocess_dayahead(df):
 
 # Default frequency == one ISP (15min).
 def aggregate_predictions(df, agg, freq='15min'):
-    df.columns = df.columns.str.replace('_', '-')
-    df['interval-start'] = pd.to_datetime(df['interval-start'])
-
     if agg not in ['first', 'last', 'mean']:
         raise ValueError(f"{agg=} is not one of ['first', 'last', 'mean'].")
+
+    df.columns = df.columns.str.replace('_', '-')
+    df['interval-start'] = pd.to_datetime(df['interval-start'])
 
     return df.groupby([pd.Grouper(freq=freq,
                                   key='interval-start')]).agg(agg).reset_index()
