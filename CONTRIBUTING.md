@@ -8,7 +8,7 @@ You can contribute in many ways:
 
 ### Report Bugs
 
-Report bugs at <https://github.com/hongyuhe/opendc_eemm/issues>.
+Report bugs at <https://github.com/hongyuhe/opendc-eemm/issues>.
 
 If you are reporting a bug, please include:
 
@@ -31,7 +31,7 @@ This project could always use more documentation, whether as part of the officia
 ### Submit Feedback
 
 The best way to send feedback is to file an issue at
-<https://github.com/hongyuhe/opendc_eemm/issues>.
+<https://github.com/hongyuhe/opendc-eemm/issues>.
 
 If you are proposing a feature:
 
@@ -39,16 +39,16 @@ If you are proposing a feature:
 -   Keep the scope as narrow as possible, to make it easier to implement.
 -   Remember that this is a volunteer-driven project, and that contributions are welcome :)
 
-## Get Started!
+## Get Ready!
 
-Ready to contribute? Here's how to set up `opendc_eemm` for local development.
+Here's how to set up OpenDC EEMM for local development.
 
-1.  Fork the <span class="title-ref">opendc_eemm</span> repo on GitHub.
+1.  Fork the `opendc-eemm` repo on GitHub.
 
 2.  Clone your fork locally:
 
     ``` shell
-    $ git clone git@github.com:your_name_here/opendc_eemm.git
+    $ git clone git@github.com:your_name_here/opendc-eemm.git
     ```
 
 3.  Install your local copy into a virtualenv. Assuming you have `virtualenvwrapper` installed, this is how you set up your fork for local development:
@@ -96,7 +96,7 @@ Before you submit a pull request, check that it meets these guidelines:
    your new functionality into a function with a docstring, and add the
    feature to the list in README.md.
 3. The pull request should work for Python 3.5, 3.6, 3.7 and 3.8, and for PyPy. Check
-   https://travis-ci.com/hongyuhe/opendc_eemm/pull_requests
+   https://travis-ci.com/hongyuhe/opendc-eemm/pull_requests
    and make sure that the tests pass for all supported Python versions.
 
 ## Tips
@@ -104,7 +104,7 @@ Before you submit a pull request, check that it meets these guidelines:
 To run a subset of tests:
 
 ```sh
-$ pytest tests.test_opendc_eemm
+$ pytest tests.opendc_eemm_test
 ```
 
 ## Deploying
