@@ -15,9 +15,24 @@ Document: <https://opendc-eemm.rtfd.io>.
 
 ---
 
+## Get Started
+
+First, you need to download market data in CSV format from the following offical websites:
+
+* Day-ahead market data: [ENTSO-E](https://transparency.entsoe.eu/dashboard/show)
+* Imbance market data: [TenT](https://www.tennet.org/english/operational_management/System_data_relating_processing/settlement_prices/index.aspx#PanelTabTable)
+
+Note that data from ENTSO-E is in CET, whilst data from TenT is in GMT. Please make sure that all market data you selected are of the same period. The `./example/market/` directory contains two such sample datasets. 
+
+Next, to run the example, you also need the simulation results produced by the [OpenDC datacenter simulator](https://opendc.org/). A sample parque file can be found [here](https://drive.google.com/file/d/1o4l8nzcxPXuHuc_qQ23eMiXJypyH4BPF/view?usp=sharing).
+
+## Installation
+
+Please follow the instructions presented [here](https://opendc-eemm.rtfd.io/en/latest/installation.html).
+
 ## Usage
 
-### Top-level commands:
+### Top-level commands
 ```shell
 usage: opendc-eemm [-v] [-h] -t path [--pue float] {trace,market,decision} ...
 
@@ -39,7 +54,7 @@ subcommands:
     decision            Optimize fine-grained decision-making.
 ```
 
-### Visualize simulation results:
+### Visualize simulation results
 
 ```shell
 usage: opendc-eemm trace [-h] -s ['power', 'oc'] [-f float] [-g value]
@@ -53,7 +68,7 @@ optional arguments:
                         Governor to visualize.
 ```
 
-### Analyze energy markets:
+### Analyze energy markets
 
 ```shell
 usage: opendc-eemm market [-h] -s ['load', 'strategy'] -o float -d path -i path
@@ -68,7 +83,7 @@ optional arguments:
                         Path to imbalance energy prices (expecting a CSV file).
 ```
 
-### Invoke DVFS scheduler:
+### Invoke DVFS scheduler
 
 ```shell
 usage: opendc-eemm decision [-h] -o ['score', 'schedule'] [-f float] -d path -i path -p path -a ['first', 'last', 'mean'] [-s path]
@@ -90,3 +105,4 @@ optional arguments:
   -s path, --save_to path
                         Destination path of the DVFS schedule.
 ```
+
