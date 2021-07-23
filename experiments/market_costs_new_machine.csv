@@ -1,0 +1,16 @@
+load,price,market,model,machine
+fullload,4108.320298115962,ondemand-high,INTERPOLATION,new
+fullload,2887.0658811387048,ondemand-med,INTERPOLATION,new
+fullload,1941.7434244826684,ondemand-low,INTERPOLATION,new
+peakload,2286.7754758521173,ondemand-high,INTERPOLATION,new
+peakload,1607.0001789259284,ondemand-med,INTERPOLATION,new
+peakload,1080.8142796315976,ondemand-low,INTERPOLATION,new
+baseload,1821.5448222638447,ondemand-high,INTERPOLATION,new
+baseload,1280.0657022127768,ondemand-med,INTERPOLATION,new
+baseload,860.9291448510709,ondemand-low,INTERPOLATION,new
+peakload,1046.082202134609,day-ahead,INTERPOLATION,new
+baseload,845.747648533092,day-ahead,INTERPOLATION,new
+fullload,1891.8298506677008,day-ahead,INTERPOLATION,new
+peakload,1013.7883550721801,imbalance,INTERPOLATION,new
+baseload,816.4426230651131,imbalance,INTERPOLATION,new
+fullload,1830.2309781372933,imbalance,INTERPOLATION,new
